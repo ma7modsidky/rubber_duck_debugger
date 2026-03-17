@@ -1,0 +1,95 @@
+{% load markdown_extras %}
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Rubber-Duck AI Debugger</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <link
+      rel="stylesheet"
+      href="[https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css](https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css)"
+    />
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js](https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js)"></script>
+    <script>
+      hljs.highlightAll();
+    </script>
+  </head>
+  <body class="bg-gray-900 text-gray-100 min-h-screen">
+    <nav class="p-6 border-b border-gray-800">
+      <h1 class="text-2xl font-bold text-yellow-500">
+        🦆 Rubber Duck Debugger
+      </h1>
+    </nav>
+
+    <main class="max-w-6xl mx-auto p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="md:col-span-2">
+        {% if result %}
+        <div class="mb-4">
+          <a
+            href="{% url 'home' %}"
+            class="text-sm text-yellow-500 hover:underline"
+            >← Start New Analysis</a
+          >
+        </div>
+        {% endif %}
+        <form method="POST" class="space-y-4">
+          {% csrf_token %}
+          <label class="block text-sm font-medium text-gray-400"
+            >Paste your Python Traceback here:</label
+          >
+          <textarea
+            name="traceback"
+            rows="10"
+            class="w-full bg-gray-800 border border-gray-700 rounded-lg p-4 font-mono text-sm focus:ring-2 focus:ring-yellow-500 outline-none"
+          ></textarea>
+          <button
+            type="submit"
+            class="bg-yellow-600 hover:bg-yellow-500 text-white px-6 py-2 rounded-lg font-bold transition"
+          >
+            Analyze Error
+          </button>
+        </form>
+
+        {% if result %}
+        <div
+          class="mt-8 p-6 bg-gray-800 rounded-xl border border-yellow-900/50"
+        >
+          <h3 class="text-xl font-semibold mb-4 text-yellow-400">
+            AI Resolution
+          </h3>
+
+          <div class="prose prose-invert prose-yellow max-w-none">
+            {{ result.ai_resolution|markdown|safe }}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
+        <h3 class="text-lg font-bold mb-4">Past Sessions</h3>
+        <ul class="space-y-3">
+          {% for log in history %}
+          <a href="{% url 'log_detail' log.id %}" class="block">
+            <li
+              class="p-3 bg-gray-900 rounded border {% if result.id == log.id %}border-yellow-500 bg-gray-800{% else %}border-gray-700{% endif %} hover:border-yellow-600 transition"
+            >
+              <div class="flex justify-between items-center mb-1">
+                <span
+                  class="text-[10px] uppercase tracking-widest text-gray-500 font-bold"
+                >
+                  {{ log.created_at|date:"H:i | M d" }}
+                </span>
+              </div>
+              <p class="text-sm font-mono text-yellow-500 truncate">
+                {{ log.error_message }}
+              </p>
+            </li>
+          </a>
+          {% endfor %}
+        </ul>
+      </div>
+    </main>
+  </body>
+</html>

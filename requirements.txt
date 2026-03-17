@@ -1,0 +1,11 @@
+django>=5.0
+langchain>=0.1.0
+langchain-google-genai>=1.0.0  # The specific bridge for Gemini
+python-dotenv
+psycopg2-binary                # For PostgreSQL
+gunicorn                       # Production web server
+markdown
+pytest
+pytest-django
+pytest-mock
+dj-database-url
