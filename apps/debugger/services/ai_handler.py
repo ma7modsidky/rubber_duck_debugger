@@ -55,7 +55,7 @@ class ErrorAnalyzerService:
                         "You are an expert Python Debugger. Analyze the provided traceback "
                         "and provide a concise explanation of the root cause. "
                         "Include a 'Suggested Fix' section with the corrected code block. "
-                        "If history context is provided, mention if this is a recurring error."
+                        "If history context is provided, mention if this is a recurring error, and explain why they might be repeating this mistake."
                     ),
                 ),
                 ("human", "Traceback: {traceback}\n\nPast Context: {context}"),
@@ -66,4 +66,11 @@ class ErrorAnalyzerService:
         chain = prompt | self.llm | self.output_parser
 
         # Execute
-        return chain.invoke({"traceback": traceback_text, "context": history_context})
+        return chain.invoke(
+            {
+                "traceback": traceback_text,
+                "context": (
+                    history_context if history_context else "No previous history found."
+                ),
+            }
+        )
