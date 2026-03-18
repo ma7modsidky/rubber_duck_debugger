@@ -33,7 +33,13 @@
             >← Start New Analysis</a
           >
         </div>
-        {% endif %}
+        {% endif %} {% if messages %} {% for message in messages %}
+        <div
+          class="p-4 mb-4 rounded-lg {% if message.tags == 'error' %}bg-red-900/50 border border-red-500 text-red-200{% else %}bg-green-900/50 border border-green-500 text-green-200{% endif %}"
+        >
+          {{ message }}
+        </div>
+        {% endfor %} {% endif %}
         <form action="{% url 'home' %}" method="POST" class="space-y-4">
           {% csrf_token %}
           <label class="block text-sm font-medium text-gray-400"

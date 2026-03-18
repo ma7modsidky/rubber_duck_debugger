@@ -30,3 +30,21 @@ class TestErrorAnalyzer:
         result = service.analyze_traceback("NameError: name 'x' is not defined")
         
         assert "Mocked AI Resolution" in result
+        
+    def test_extract_error_title_non_traceback(self):
+        """Test how we handle text that isn't a traceback at all."""
+        weird_text = "Hello, I am just a random sentence."
+        title = ErrorAnalyzerService.extract_error_title(weird_text)
+        # Based on your regex, it should hit the fallback
+        assert title == "General Python Error"
+
+    def test_analyze_traceback_api_failure(self, mocker):
+        """Test that the service propagates exceptions when the API fails."""
+        service = ErrorAnalyzerService()
+        # Mock a connection error or rate limit
+        mocker.patch("langchain_core.runnables.base.RunnableSequence.invoke", 
+                    side_effect=Exception("API Quota Exceeded"))
+        
+        with pytest.raises(Exception) as excinfo:
+            service.analyze_traceback("NameError: x")
+        assert "API Quota Exceeded" in str(excinfo.value)    
